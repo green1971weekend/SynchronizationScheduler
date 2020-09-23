@@ -11,6 +11,8 @@ namespace SynchronizationScheduler.Domain.Models.Application
     {
         public int Id { get; set; }
 
+        public string CloudId { get; set; }
+
         public string Name { get; set; }
 
         public string Email { get; set; }
