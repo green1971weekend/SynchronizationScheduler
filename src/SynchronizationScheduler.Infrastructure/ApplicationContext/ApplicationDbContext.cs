@@ -5,6 +5,8 @@ using SynchronizationScheduler.Infrastructure.ApplicationContext.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SynchronizationScheduler.Infrastructure.ApplicationContext
 {
@@ -40,6 +42,12 @@ namespace SynchronizationScheduler.Infrastructure.ApplicationContext
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        /// <inheritdoc/>
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }

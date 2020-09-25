@@ -11,7 +11,7 @@ using System.Text;
 namespace SynchronizationScheduler.Infrastructure
 {
     /// <summary>
-    /// Extension class for adding infrastructure services.
+    /// Extension class for adding infrastructure level services.
     /// </summary>
     public static class InfrastructureServiceCollectionExtension
     {
@@ -23,8 +23,11 @@ namespace SynchronizationScheduler.Infrastructure
         /// <returns></returns>
         public static IServiceCollection AddInfrastructureDependency(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            serviceCollection.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ApplicationConnection")));
-            serviceCollection.AddDbContext<ICloudDbContext, CloudDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("CloudConnection")));
+            serviceCollection.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ApplicationConnection")));
+            serviceCollection.AddDbContext<CloudDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("CloudConnection")));
+
+            serviceCollection.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
+            serviceCollection.AddScoped<ICloudDbContext>(provider => provider.GetService<CloudDbContext>());
 
             return serviceCollection;
         }

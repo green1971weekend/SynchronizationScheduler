@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SynchronizationScheduler.Domain.Models.Application;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SynchronizationScheduler.Application.Interfaces
 {
@@ -22,5 +24,10 @@ namespace SynchronizationScheduler.Application.Interfaces
         /// List of comments contained in the application database.
         /// </summary>
         DbSet<Comment> Comments { get; set; }
+
+        /// <summary>
+        /// Asynchronously saves all current changes to the database. Need to be defined here for using it in the application managers.
+        /// </summary>
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
