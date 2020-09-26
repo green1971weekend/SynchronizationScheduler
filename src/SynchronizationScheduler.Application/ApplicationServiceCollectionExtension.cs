@@ -22,6 +22,9 @@ namespace SynchronizationScheduler.Application
         public static IServiceCollection AddApplicationDependency(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddAutoMapper(Assembly.GetExecutingAssembly());
+            serviceCollection.AddScoped<IPersonManager, PersonManager>();
+            serviceCollection.AddScoped<IPostManager, PostManager>();
+            serviceCollection.AddScoped<ICommentManager, CommentManager>();
             serviceCollection.AddScoped<ICloudManager, CloudManager>();
 
             return serviceCollection;

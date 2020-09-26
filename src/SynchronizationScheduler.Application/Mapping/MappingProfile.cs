@@ -18,6 +18,10 @@ namespace SynchronizationScheduler.Application.Mapping
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
+        /// <summary>
+        /// Takes all types which relates to IMapFrom interface and creates map foreach instance.
+        /// </summary>
+        /// <param name="assembly"></param>
         private void ApplyMappingsFromAssembly(Assembly assembly)
         {
             var types = assembly.GetExportedTypes()
@@ -33,7 +37,6 @@ namespace SynchronizationScheduler.Application.Mapping
                     ?? type.GetInterface("IMapFrom`1").GetMethod("Mapping");
 
                 methodInfo?.Invoke(instance, new object[] { this });
-
             }
         }
     }

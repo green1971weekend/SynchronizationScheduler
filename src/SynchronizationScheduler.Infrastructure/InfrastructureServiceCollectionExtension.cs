@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SynchronizationScheduler.Application.Interfaces;
 using SynchronizationScheduler.Infrastructure.ApplicationContext;
 using SynchronizationScheduler.Infrastructure.CloudContext;
+using SynchronizationScheduler.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,6 +29,8 @@ namespace SynchronizationScheduler.Infrastructure
 
             serviceCollection.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
             serviceCollection.AddScoped<ICloudDbContext>(provider => provider.GetService<CloudDbContext>());
+
+            serviceCollection.AddScoped<IPersonSynchronizationService, PersonSynchronizationService>();
 
             return serviceCollection;
         }

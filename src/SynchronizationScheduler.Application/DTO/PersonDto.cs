@@ -11,7 +11,7 @@ namespace SynchronizationScheduler.Application.DTO
     {
         public int Id { get; set; }
 
-        public string CloudId { get; set; }
+        public int CloudId { get; set; }
 
         public string Name { get; set; }
 

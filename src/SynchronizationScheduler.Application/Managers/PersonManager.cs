@@ -29,11 +29,7 @@ namespace SynchronizationScheduler.Application.Managers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        /// <summary>
-        /// Creates a new person and saving it to the database.
-        /// </summary>
-        /// <param name="personDto">Data transfer object.</param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public async Task<int> CreatePerson(PersonDto personDto)
         {
             var person = _mapper.Map<Person>(personDto);
@@ -42,18 +38,21 @@ namespace SynchronizationScheduler.Application.Managers
             return await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<PersonDto> GetPerson(int id)
         {
             var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == id);
             return _mapper.Map<PersonDto>(person);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<PersonDto>> GetPeople()
         {
             var people = await _context.Persons.ToListAsync();
             return _mapper.Map<IEnumerable<PersonDto>>(people);
         }
 
+        /// <inheritdoc/>
         public async Task<int> UpdatePerson(PersonDto personDto)
         {
             var person = _mapper.Map<Person>(personDto);
@@ -62,6 +61,7 @@ namespace SynchronizationScheduler.Application.Managers
             return await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<int> DeletePerson(int id)
         {
             var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == id);

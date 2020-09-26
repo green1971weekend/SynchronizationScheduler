@@ -9,7 +9,7 @@ namespace SynchronizationScheduler.Domain.Models.Application
     {
         public int Id { get; set; }
 
-        public string CloudId { get; set; }
+        public int CloudId { get; set; }
 
         public string Title { get; set; }
 
