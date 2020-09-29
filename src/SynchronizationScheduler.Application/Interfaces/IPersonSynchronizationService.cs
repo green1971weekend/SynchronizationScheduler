@@ -11,8 +11,18 @@ namespace SynchronizationScheduler.Application.Interfaces
     public interface IPersonSynchronizationService
     {
         /// <summary>
-        /// Synchronizes application person data with the cloud data.
+        /// Adds existing persons in the cloud to the application database.
         /// </summary>
-        public Task SynchronizeForAddingPeople();
+        public Task SynchronizeForAddingPeopleAsync();
+
+        /// <summary>
+        /// Deletes existing persons in the cloud to the application database.
+        /// </summary>
+        public Task SynchronizeForDeletingPeopleAsync();
+
+        /// <summary>
+        /// Updates existing persons in the cloud to the application database.
+        /// </summary>
+        public Task SynchronizeForUpdatingPeopleAsync();
     }
 }

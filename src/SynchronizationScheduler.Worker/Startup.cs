@@ -1,3 +1,4 @@
+using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SynchronizationScheduler.Application;
 using SynchronizationScheduler.Infrastructure;
+using SynchronizationScheduler.Worker.ScheduleTasks;
+using System;
 
 namespace SynchronizationScheduler.Worker
 {
@@ -24,6 +27,7 @@ namespace SynchronizationScheduler.Worker
         {
             services.AddApplicationDependency();
             services.AddInfrastructureDependency(Configuration);
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

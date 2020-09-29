@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Coravel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using SynchronizationScheduler.Application;
+using SynchronizationScheduler.Infrastructure;
+using SynchronizationScheduler.Worker.ScheduleTasks;
 
 namespace SynchronizationScheduler.Worker
 {
@@ -13,14 +13,28 @@ namespace SynchronizationScheduler.Worker
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            IHost host = CreateHostBuilder(args).Build();
+            host.Services.UseScheduler(scheduler =>
+            {
+                scheduler
+                    .Schedule<PersonSynchronizationScheduler>()
+                    .EveryMinute();
+            });
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+                .ConfigureServices(services =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    var configuration = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
+                        .Build();
+
+                    services.AddScheduler();
+                    services.AddTransient<PersonSynchronizationScheduler>();
+                    services.AddApplicationDependency();
+                    services.AddInfrastructureDependency(configuration);
                 });
     }
 }

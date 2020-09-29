@@ -18,11 +18,11 @@ namespace SynchronizationScheduler.Application.DTO
         public string Email { get; set; }
 
         ///<inheritdoc/>
-        public void Mapping(Profile profile)
-        {
-            // If there is a need to add some specification for mapping - add it here with ForMember method. 
-            //If not there is no need to add Mapping method here because it implemented in the IMapFrom.
-            profile.CreateMap<Person, PersonDto>();
-        }
+        //public void Mapping(Profile profile)
+        //{
+        //    // If there is a need to add some specification for mapping - add it here with ForMember method. 
+        //    //If not there is no need to add Mapping method here because it implemented in the IMapFrom.
+        //    profile.CreateMap<Person, PersonDto>();
+        //}
     }
 }

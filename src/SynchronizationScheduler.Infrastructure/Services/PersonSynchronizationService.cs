@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SynchronizationScheduler.Application.DTO;
 using SynchronizationScheduler.Application.Interfaces;
-using SynchronizationScheduler.Domain.Models.Application;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SynchronizationScheduler.Infrastructure.Services
@@ -29,13 +27,13 @@ namespace SynchronizationScheduler.Infrastructure.Services
         }
 
         ///<inheritdoc/>
-        public async Task SynchronizeForAddingPeople()
+        public async Task SynchronizeForAddingPeopleAsync()
         {
             var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
-            var applicationPeople = (await _personManager.GetPeople()).ToList();
+            var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
 
             var cloudPeopleIds = cloudPeople.Select(p => p.Id).ToList();
-            var applicationPeopleIds = applicationPeople.Select(p => p.Id).ToList();
+            var applicationPeopleIds = applicationPeople.Select(p => p.CloudId).ToList();
 
             var idsForSync = cloudPeopleIds.Except(applicationPeopleIds);
 
@@ -44,18 +42,70 @@ namespace SynchronizationScheduler.Infrastructure.Services
                 newId => newId,
                 (cloudPerson, newId) => cloudPerson); // return a new selection consisting of persons(=> cloudPerson) in which cloudPerson.Id matches newId(idsForSync).
 
-            foreach(var user in peopleForSync)
+            if (peopleForSync.Any())
             {
-                var personDto = new PersonDto
+                foreach (var user in peopleForSync)
                 {
-                    CloudId = user.Id,
-                    Name = user.Name,
-                    Email = user.Email
-                };
+                    var personDto = new PersonDto
+                    {
+                        CloudId = user.Id,
+                        Name = user.Name,
+                        Email = user.Email
+                    };
 
-                await _personManager.CreatePerson(personDto);
+                    await _personManager.CreatePersonAsync(personDto);
+                }
             }
         }
 
+        ///<inheritdoc/>
+        public async Task SynchronizeForDeletingPeopleAsync()
+        {
+            var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
+            var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
+
+            var cloudPeopleIds = cloudPeople.Select(p => p.Id).ToList();
+            var applicationPeopleIds = applicationPeople.Select(p => p.CloudId).ToList();
+
+            var idsForSync = applicationPeopleIds.Except(cloudPeopleIds);
+
+            if(idsForSync.Any())
+            {
+                foreach (var id in idsForSync)
+                {
+                    await _personManager.DeletePersonByCloudIdAsync(id);
+                }
+            }
+        }
+
+        ///<inheritdoc/>
+        public async Task SynchronizeForUpdatingPeopleAsync()
+        {
+            var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
+            var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
+            
+            foreach(var person in applicationPeople)
+            {
+                var cloudUser = cloudPeople.FirstOrDefault(user => user.Id == person.CloudId);
+                var isUpdated = false;
+
+                if(person.Name != cloudUser.Name)
+                {
+                    person.Name = cloudUser.Name;
+                    isUpdated = true;
+                }
+
+                if (person.Email != cloudUser.Email)
+                {
+                    person.Email = cloudUser.Email;
+                    isUpdated = true;
+                }
+
+                if(isUpdated)
+                {
+                    await _personManager.UpdatePersonAsync(person);
+                }
+            }
+        }
     }
 }

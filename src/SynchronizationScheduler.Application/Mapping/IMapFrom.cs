@@ -9,9 +9,9 @@ namespace SynchronizationScheduler.Application.Mapping
     public interface IMapFrom<T>
     {
         /// <summary>
-        /// Configuration for matching types which implemented through the profile.
+        /// Configuration for matching types which implemented through the profile. CreateMap method takes db entity for typeof(T) and current dto model for GetType().
         /// </summary>
-        /// <param name="profile"></param>
-        void Mapping(Profile profile) => profile.CreateMap(typeof(T), GetType());
+        /// <param name="profile">Mapping profile.</param>
+        void Mapping(Profile profile) => profile.CreateMap(typeof(T), GetType()).ReverseMap();
     }
 }
