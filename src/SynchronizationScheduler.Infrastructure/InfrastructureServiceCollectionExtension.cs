@@ -31,6 +31,7 @@ namespace SynchronizationScheduler.Infrastructure
             serviceCollection.AddScoped<ICloudDbContext>(provider => provider.GetService<CloudDbContext>());
 
             serviceCollection.AddScoped<IPersonSynchronizationService, PersonSynchronizationService>();
+            serviceCollection.AddScoped<IPostSynchronizationService, PostSynchronizationService>();
 
             return serviceCollection;
         }

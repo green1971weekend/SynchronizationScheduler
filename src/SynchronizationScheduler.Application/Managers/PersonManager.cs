@@ -29,7 +29,6 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> CreatePersonAsync(PersonDto personDto)
         {
-
             var person = _mapper.Map<PersonDto, Person>(personDto);
             await _context.Persons.AddAsync(person);
 
@@ -40,6 +39,20 @@ namespace SynchronizationScheduler.Application.Managers
         public async Task<PersonDto> GetPersonAsync(int id)
         {
             var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == id);
+            return _mapper.Map<Person, PersonDto>(person);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PersonDto> GetPersonWithoutTrackingAsync(int id)
+        {
+            var person = await _context.Persons.AsNoTracking().SingleOrDefaultAsync(person => person.Id == id);
+            return _mapper.Map<Person, PersonDto>(person);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PersonDto> GetPersonWithoutTrackingByCloudIdAsync(int id)
+        {
+            var person = await _context.Persons.AsNoTracking().SingleOrDefaultAsync(person => person.CloudId == id);
             return _mapper.Map<Person, PersonDto>(person);
         }
 
@@ -60,15 +73,8 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> UpdatePersonAsync(PersonDto personDto)
         {
-            try
-            {
-                var person = _mapper.Map<PersonDto, Person>(personDto);
-                _context.Persons.Update(person);
-            }
-            catch(Exception)
-            {
-                throw;
-            }
+            var person = _mapper.Map<PersonDto, Person>(personDto);
+            _context.Persons.Update(person);
 
             return await _context.SaveChangesAsync();
         }

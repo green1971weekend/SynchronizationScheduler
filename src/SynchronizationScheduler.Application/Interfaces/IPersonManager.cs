@@ -20,8 +20,20 @@ namespace SynchronizationScheduler.Application.Interfaces
         /// <summary>
         /// Returns an existing person from the database.
         /// </summary>
-        /// <param name="personDto">Identifier.</param>
+        /// <param name="id">Identifier.</param>
         public Task<PersonDto> GetPersonAsync(int id);
+
+        /// <summary>
+        /// Returns an existing person from the database without tracking this object in the EF cache.
+        /// </summary>
+        /// <param name="id">Identifier.</param>
+        Task<PersonDto> GetPersonWithoutTrackingAsync(int id);
+
+        /// <summary>
+        /// Returns an existing person from the database without tracking this object in the EF cache.
+        /// </summary>
+        /// <param name="id">Cloud Identifier.</param>
+        Task<PersonDto> GetPersonWithoutTrackingByCloudIdAsync(int id);
 
         /// <summary>
         /// Returns a full list of existing persons from the database.
@@ -48,7 +60,7 @@ namespace SynchronizationScheduler.Application.Interfaces
         /// <summary>
         /// Deletes an existing person from the database by the cloud id. Solves a problem with different id value between cloud and application.
         /// </summary>
-        /// <param name="id">Identifier.</param>
+        /// <param name="cloudId">Identifier.</param>
         Task<int> DeletePersonByCloudIdAsync(int cloudId);
     }
 }

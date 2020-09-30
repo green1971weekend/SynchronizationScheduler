@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using SynchronizationScheduler.Application;
 using SynchronizationScheduler.Infrastructure;
 using SynchronizationScheduler.Worker.ScheduleTasks;
+using System;
 
 namespace SynchronizationScheduler.Worker
 {
@@ -18,7 +19,13 @@ namespace SynchronizationScheduler.Worker
             {
                 scheduler
                     .Schedule<PersonSynchronizationScheduler>()
-                    .EveryMinute();
+                    .DailyAt(12, 00)
+                    .Zoned(TimeZoneInfo.Local);
+
+                scheduler
+                    .Schedule<PostSynchronizationScheduler>()
+                    .DailyAt(12, 01)
+                    .Zoned(TimeZoneInfo.Local);
             });
             host.Run();
         }
@@ -33,6 +40,7 @@ namespace SynchronizationScheduler.Worker
 
                     services.AddScheduler();
                     services.AddTransient<PersonSynchronizationScheduler>();
+                    services.AddTransient<PostSynchronizationScheduler>();
                     services.AddApplicationDependency();
                     services.AddInfrastructureDependency(configuration);
                 });
