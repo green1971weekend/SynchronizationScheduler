@@ -32,6 +32,7 @@ namespace SynchronizationScheduler.Infrastructure
 
             serviceCollection.AddScoped<IPersonSynchronizationService, PersonSynchronizationService>();
             serviceCollection.AddScoped<IPostSynchronizationService, PostSynchronizationService>();
+            serviceCollection.AddScoped<ICommentSynchronizationService, CommentSynchronizationService>();
 
             return serviceCollection;
         }

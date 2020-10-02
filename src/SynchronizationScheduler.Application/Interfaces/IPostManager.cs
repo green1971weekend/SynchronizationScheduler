@@ -18,8 +18,20 @@ namespace SynchronizationScheduler.Application.Interfaces
         /// <summary>
         /// Returns an existing post from the database.
         /// </summary>
-        /// <param name="postDto">Identifier.</param>
+        /// <param name="id">Identifier.</param>
         public Task<PostDto> GetPostAsync(int id);
+
+        /// <summary>
+        /// Returns an existing post from the database without tracking the objects in the EF cache..
+        /// </summary>
+        /// <param name="id">Identifier.</param>
+        public Task<PostDto> GetPostWithoutTrackingAsync(int id);
+
+        /// <summary>
+        /// Returns an existing post from database by the cloud identifier without tracking the objects in the EF cache.
+        /// </summary>
+        /// <param name="cloudId">Cloud identifier.</param>
+        public Task<PostDto> GetPostWithoutTrackingByCloudIdAsync(int cloudId);
 
         /// <summary>
         /// Returns a full list of existing posts from the database.

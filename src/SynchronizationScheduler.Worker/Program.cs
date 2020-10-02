@@ -19,12 +19,17 @@ namespace SynchronizationScheduler.Worker
             {
                 scheduler
                     .Schedule<PersonSynchronizationScheduler>()
-                    .DailyAt(12, 00)
+                    .DailyAt(00, 01)
                     .Zoned(TimeZoneInfo.Local);
 
                 scheduler
                     .Schedule<PostSynchronizationScheduler>()
-                    .DailyAt(12, 01)
+                    .DailyAt(00, 02)
+                    .Zoned(TimeZoneInfo.Local);
+
+                scheduler
+                    .Schedule<CommentSynchronizationScheduler>()
+                    .DailyAt(00, 03)
                     .Zoned(TimeZoneInfo.Local);
             });
             host.Run();
@@ -41,6 +46,7 @@ namespace SynchronizationScheduler.Worker
                     services.AddScheduler();
                     services.AddTransient<PersonSynchronizationScheduler>();
                     services.AddTransient<PostSynchronizationScheduler>();
+                    services.AddTransient<CommentSynchronizationScheduler>();
                     services.AddApplicationDependency();
                     services.AddInfrastructureDependency(configuration);
                 });

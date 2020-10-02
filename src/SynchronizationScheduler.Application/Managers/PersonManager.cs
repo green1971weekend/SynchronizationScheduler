@@ -38,21 +38,21 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<PersonDto> GetPersonAsync(int id)
         {
-            var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == id);
+            var person = await _context.Persons.FirstOrDefaultAsync(person => person.Id == id);
             return _mapper.Map<Person, PersonDto>(person);
         }
 
         /// <inheritdoc/>
         public async Task<PersonDto> GetPersonWithoutTrackingAsync(int id)
         {
-            var person = await _context.Persons.AsNoTracking().SingleOrDefaultAsync(person => person.Id == id);
+            var person = await _context.Persons.AsNoTracking().FirstOrDefaultAsync(person => person.Id == id);
             return _mapper.Map<Person, PersonDto>(person);
         }
 
         /// <inheritdoc/>
         public async Task<PersonDto> GetPersonWithoutTrackingByCloudIdAsync(int id)
         {
-            var person = await _context.Persons.AsNoTracking().SingleOrDefaultAsync(person => person.CloudId == id);
+            var person = await _context.Persons.AsNoTracking().FirstOrDefaultAsync(person => person.CloudId == id);
             return _mapper.Map<Person, PersonDto>(person);
         }
 
@@ -82,7 +82,7 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> DeletePersonAsync(int id)
         {
-            var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == id);
+            var person = await _context.Persons.FirstOrDefaultAsync(person => person.Id == id);
             _context.Persons.Remove(person);
 
             return await _context.SaveChangesAsync();
@@ -91,7 +91,7 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> DeletePersonByCloudIdAsync(int cloudId)
         {
-            var person = await _context.Persons.SingleOrDefaultAsync(person => person.Id == cloudId);
+            var person = await _context.Persons.FirstOrDefaultAsync(person => person.Id == cloudId);
             _context.Persons.Remove(person);
 
             return await _context.SaveChangesAsync();

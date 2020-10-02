@@ -22,6 +22,7 @@ namespace SynchronizationScheduler.Infrastructure.Services
         /// </summary>
         /// <param name="cloudManager">Cloud Manager.</param>
         /// <param name="postManager">Post Manager.</param>
+        /// /// <param name="personManager">Person Manager.</param>
         public PostSynchronizationService(ICloudManager cloudManager, IPostManager postManager, IPersonManager personManager)
         {
             _cloudManager = cloudManager ?? throw new ArgumentNullException(nameof(cloudManager));

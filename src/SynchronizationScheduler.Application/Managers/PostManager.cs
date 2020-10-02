@@ -39,7 +39,21 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<PostDto> GetPostAsync(int id)
         {
-            var post = await _context.Posts.SingleOrDefaultAsync(post => post.Id == id);
+            var post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == id);
+            return _mapper.Map<Post, PostDto>(post);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PostDto> GetPostWithoutTrackingAsync(int id)
+        {
+            var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(post => post.Id == id);
+            return _mapper.Map<Post, PostDto>(post);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PostDto> GetPostWithoutTrackingByCloudIdAsync(int cloudId)
+        {
+            var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(post => post.CloudId == cloudId);
             return _mapper.Map<Post, PostDto>(post);
         }
 
@@ -69,7 +83,7 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> DeletePostAsync(int id)
         {
-            var post = await _context.Posts.SingleOrDefaultAsync(post => post.Id == id);
+            var post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == id);
             _context.Posts.Remove(post);
 
             return await _context.SaveChangesAsync();
@@ -78,7 +92,7 @@ namespace SynchronizationScheduler.Application.Managers
         /// <inheritdoc/>
         public async Task<int> DeletePostByCloudIdAsync(int cloudId)
         {
-            var post = await _context.Posts.SingleOrDefaultAsync(post => post.CloudId == cloudId);
+            var post = await _context.Posts.FirstOrDefaultAsync(post => post.CloudId == cloudId);
             _context.Posts.Remove(post);
 
             return await _context.SaveChangesAsync();

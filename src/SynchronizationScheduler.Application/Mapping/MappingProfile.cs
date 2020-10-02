@@ -19,7 +19,7 @@ namespace SynchronizationScheduler.Application.Mapping
         }
 
         /// <summary>
-        /// Takes all types which relates to IMapFrom interface and creates map foreach instance.
+        /// Takes all types which implements IMapFrom interface and creates map foreach instance.
         /// </summary>
         /// <param name="assembly"></param>
         private void ApplyMappingsFromAssembly(Assembly assembly)
