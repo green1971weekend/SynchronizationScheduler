@@ -8,6 +8,11 @@ namespace SynchronizationScheduler.Infrastructure.CloudContext
     public class CloudDbContext : DbContext, ICloudDbContext
     {
         /// <summary>
+        /// Default constructor. In the test project allows make an instance with mock.
+        /// </summary>
+        public CloudDbContext() { }
+
+        /// <summary>
         /// Passing configuration connection options to the base constructor of the DbContext.
         /// </summary>
         /// <param name="options">Options of the DbContext such as a connection string to specific database.</param>
@@ -16,13 +21,13 @@ namespace SynchronizationScheduler.Infrastructure.CloudContext
 
 
         /// <inheritdoc/>
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         /// <inheritdoc/>
-        public DbSet<Post> Posts { get; set; }
+        public virtual DbSet<Post> Posts { get; set; }
 
         /// <inheritdoc/>
-        public DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
 
     }
 }
