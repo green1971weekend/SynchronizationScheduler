@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SynchronizationScheduler.Application.DTO;
 using SynchronizationScheduler.Application.Interfaces;
 using System;
@@ -17,22 +18,31 @@ namespace SynchronizationScheduler.Infrastructure.Services
 
         private readonly IPersonManager _personManager;
 
+        private readonly ILogger<PostSynchronizationService> _logger;
+
         /// <summary>
         /// Constructor for resolving Cloud manager, Post manager from DI container.
         /// </summary>
         /// <param name="cloudManager">Cloud Manager.</param>
         /// <param name="postManager">Post Manager.</param>
-        /// /// <param name="personManager">Person Manager.</param>
-        public PostSynchronizationService(ICloudManager cloudManager, IPostManager postManager, IPersonManager personManager)
-        {
+        /// <param name="personManager">Person Manager.</param>
+        /// <param name="logger">Serilog.</param>
+        public PostSynchronizationService(ICloudManager cloudManager, 
+                                            IPostManager postManager, 
+                                            IPersonManager personManager, 
+                                            ILogger<PostSynchronizationService> logger)
+            {
             _cloudManager = cloudManager ?? throw new ArgumentNullException(nameof(cloudManager));
             _postManager = postManager ?? throw new ArgumentNullException(nameof(postManager));
             _personManager = personManager ?? throw new ArgumentNullException(nameof(personManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForAddingPostsAsync()
         {
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.StartSynchronizationForAdditionPost);
+
             var cloudPosts = await _cloudManager.GetPosts().ToListAsync();
             var applicationPosts = (await _postManager.GetPostsWithoutTrackingAsync()).ToList();
 
@@ -51,24 +61,35 @@ namespace SynchronizationScheduler.Infrastructure.Services
                 foreach (var post in postsForSync)
                 {
                     var applicationPersons = await _personManager.GetPeopleWithoutTrackingAsync();
-                    var personId = applicationPersons.SingleOrDefault(person => person.CloudId == post.PersonId).Id;
+                    var person = applicationPersons.SingleOrDefault(person => person.CloudId == post.PersonId);
 
-                    var postDto = new PostDto
+                    if(person != null)
                     {
-                        CloudId = post.Id,
-                        PersonId = personId,
-                        Title = post.Title,
-                        Body = post.Body
-                    };
+                        var postDto = new PostDto
+                        {
+                            CloudId = post.Id,
+                            PersonId = person.Id,
+                            Title = post.Title,
+                            Body = post.Body
+                        };
 
-                    await _postManager.CreatePostAsync(postDto);
+                        await _postManager.CreatePostAsync(postDto);
+                    }
+                    else
+                    {
+                        _logger.LogError(Application.Resources.ErrorMessages.PostSyncService_AddingPostError, post.PersonId);
+                    }
                 }
             }
+
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.EndSynchronizationForAdditionPost);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForDeletingPostsAsync()
         {
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.StartSynchronizationForDeletionPost);
+
             var cloudPosts = await _cloudManager.GetPosts().ToListAsync();
             var applicationPosts = (await _postManager.GetPostsWithoutTrackingAsync()).ToList();
 
@@ -84,11 +105,15 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _postManager.DeletePostByCloudIdAsync(id);
                 }
             }
+
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.EndSynchronizationForDeletionPost);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForUpdatingPostsAsync()
         {
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.StartSynchronizationForUpdationPost);
+
             var cloudPosts = await _cloudManager.GetPosts().ToListAsync();
             var applicationPosts = (await _postManager.GetPostsWithoutTrackingAsync()).ToList();
 
@@ -123,6 +148,8 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _postManager.UpdatePostAsync(appPost);
                 }
             }
+
+            _logger.LogInformation(Application.Resources.PostSynchronizationService.EndSynchronizationForUpdationPost);
         }
     }
 }

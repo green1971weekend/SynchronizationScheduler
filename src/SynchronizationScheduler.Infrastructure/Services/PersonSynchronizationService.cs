@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SynchronizationScheduler.Application.DTO;
 using SynchronizationScheduler.Application.Interfaces;
+using SynchronizationScheduler.Application.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +17,28 @@ namespace SynchronizationScheduler.Infrastructure.Services
 
         private readonly IPersonManager _personManager;
 
+        private readonly ILogger<PostSynchronizationService> _logger;
+
         /// <summary>
         /// Constructor for resolving CloudManager, PersonManager from DI container.
         /// </summary>
         /// <param name="cloudManager">CloudManager.</param>
         /// <param name="personManager">PersonManager.</param>
-        public PersonSynchronizationService(ICloudManager cloudManager, IPersonManager personManager)
+        /// <param name="logger">Serilog.</param>
+        public PersonSynchronizationService(ICloudManager cloudManager, 
+                                            IPersonManager personManager,
+                                            ILogger<PostSynchronizationService> logger)
         {
             _cloudManager = cloudManager ?? throw new ArgumentNullException(nameof(cloudManager));
             _personManager = personManager ?? throw new ArgumentNullException(nameof(personManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForAddingPeopleAsync()
         {
+            _logger.LogInformation(PeopleSynchronizationService.StartSynchronizationForAdditionPeople);
+
             var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
             var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
 
@@ -56,11 +66,15 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _personManager.CreatePersonAsync(personDto);
                 }
             }
+
+            _logger.LogInformation(PeopleSynchronizationService.EndSynchronizationForAdditionPeople);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForDeletingPeopleAsync()
         {
+            _logger.LogInformation(PeopleSynchronizationService.StartSynchronizationForDeletionPeople);
+
             var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
             var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
 
@@ -76,11 +90,15 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _personManager.DeletePersonByCloudIdAsync(id);
                 }
             }
+
+            _logger.LogInformation(PeopleSynchronizationService.EndSynchronizationForDeletionPeople);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForUpdatingPeopleAsync()
         {
+            _logger.LogInformation(PeopleSynchronizationService.StartSynchronizationForUpdationPeople);
+
             var cloudPeople = await _cloudManager.GetUsers().ToListAsync();
             var applicationPeople = (await _personManager.GetPeopleWithoutTrackingAsync()).ToList();
             
@@ -106,6 +124,8 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _personManager.UpdatePersonAsync(person);
                 }
             }
+
+            _logger.LogInformation(PeopleSynchronizationService.EndSynchronizationForUpdationPeople);
         }
     }
 }

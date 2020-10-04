@@ -22,7 +22,6 @@ namespace SynchronizationScheduler.Worker.ScheduleTasks
         /// </summary>
         public async Task Invoke()
         {
-            Console.WriteLine("Synchronizing comment data...");
             await _commentSynchronizationService.SynchronizeForAddingCommentsAsync();
             await _commentSynchronizationService.SynchronizeForDeletingCommentsAsync();
             await _commentSynchronizationService.SynchronizeForUpdatingCommentsAsync();

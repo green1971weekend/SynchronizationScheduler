@@ -22,7 +22,6 @@ namespace SynchronizationScheduler.Worker.ScheduleTasks
         /// </summary>
         public async Task Invoke()
         {
-            Console.WriteLine("Synchronizing post data...");
             await _postSynchronizationService.SynchronizeForAddingPostsAsync();
             await _postSynchronizationService.SynchronizeForDeletingPostsAsync();
             await _postSynchronizationService.SynchronizeForUpdatingPostsAsync();

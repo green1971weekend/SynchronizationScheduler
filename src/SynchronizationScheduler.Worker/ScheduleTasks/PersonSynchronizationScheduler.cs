@@ -22,7 +22,6 @@ namespace SynchronizationScheduler.Worker.ScheduleTasks
         /// </summary>
         public async Task Invoke()
         {
-            Console.WriteLine("Synchronizing person data...");
             await _personSynchronizationService.SynchronizeForAddingPeopleAsync();
             await _personSynchronizationService.SynchronizeForDeletingPeopleAsync();
             await _personSynchronizationService.SynchronizeForUpdatingPeopleAsync();

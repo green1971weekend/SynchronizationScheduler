@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SynchronizationScheduler.Application.DTO;
 using SynchronizationScheduler.Application.Interfaces;
+using SynchronizationScheduler.Application.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,22 +20,31 @@ namespace SynchronizationScheduler.Infrastructure.Services
 
         private readonly IPostManager _postManager;
 
+        private readonly ILogger<PostSynchronizationService> _logger;
+
         /// <summary>
         /// Constructor for resolving Cloud manager, Post manager from DI container.
         /// </summary>
         /// <param name="cloudManager">Cloud Manager.</param>
         /// <param name="postManager">Post Manager.</param>
-        /// /// <param name="commentManager">Comment Manager.</param>
-        public CommentSynchronizationService(ICloudManager cloudManager, IPostManager postManager, ICommentManager commentManager)
+        /// <param name="commentManager">Comment Manager.</param>
+        /// <param name="logger">Serilog.</param>
+        public CommentSynchronizationService(ICloudManager cloudManager, 
+                                                IPostManager postManager, 
+                                                ICommentManager commentManager,
+                                                ILogger<PostSynchronizationService> logger)
         {
             _cloudManager = cloudManager ?? throw new ArgumentNullException(nameof(cloudManager));
             _postManager = postManager ?? throw new ArgumentNullException(nameof(postManager));
             _commentManager = commentManager ?? throw new ArgumentNullException(nameof(commentManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForAddingCommentsAsync()
         {
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.StartSynchronizationForUpdationComment);
+
             var cloudComments = await _cloudManager.GetComments().ToListAsync();
             var applicationComments = (await _commentManager.GetCommentsWithoutTrackingAsync()).ToList();
 
@@ -52,24 +63,35 @@ namespace SynchronizationScheduler.Infrastructure.Services
                 foreach (var comment in commentsForSync)
                 {
                     var applicationPosts = await _postManager.GetPostsWithoutTrackingAsync();
-                    var postId = applicationPosts.FirstOrDefault(post => post.CloudId == comment.PostId).Id;
+                    var post = applicationPosts.FirstOrDefault(post => post.CloudId == comment.PostId);
 
-                    var commentDto = new CommentDto
+                    if(post != null)
                     {
-                        CloudId = comment.Id,
-                        PostId = postId,
-                        Email = comment.Email,
-                        Name = comment.Name
-                    };
+                        var commentDto = new CommentDto
+                        {
+                            CloudId = comment.Id,
+                            PostId = post.Id,
+                            Email = comment.Email,
+                            Name = comment.Name
+                        };
 
-                    await _commentManager.CreateCommentAsync(commentDto);
+                        await _commentManager.CreateCommentAsync(commentDto);
+                    }
+                    else
+                    {
+                        _logger.LogError(ErrorMessages.CommentSyncService_AddingCommentError, comment.PostId);
+                    }
                 }
             }
+
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.EndSynchronizationForUpdationComment);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForDeletingCommentsAsync()
         {
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.StartSynchronizationForDeletionComment);
+
             var cloudComments = await _cloudManager.GetComments().ToListAsync();
             var applicationComments = (await _commentManager.GetCommentsWithoutTrackingAsync()).ToList();
 
@@ -85,11 +107,15 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _commentManager.DeleteCommentByCloudIdAsync(id);
                 }
             }
+
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.EndSynchronizationForDeletionComment);
         }
 
         ///<inheritdoc/>
         public async Task SynchronizeForUpdatingCommentsAsync()
         {
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.StartSynchronizationForUpdationComment);
+
             var cloudComments = await _cloudManager.GetComments().ToListAsync();
             var applicationComments = (await _commentManager.GetCommentsWithoutTrackingAsync()).ToList();
 
@@ -131,6 +157,8 @@ namespace SynchronizationScheduler.Infrastructure.Services
                     await _commentManager.UpdateCommentAsync(appComment);
                 }
             }
+
+            _logger.LogInformation(Application.Resources.CommentSynchronizationService.EndSynchronizationForUpdationComment);
         }
     }
 }
